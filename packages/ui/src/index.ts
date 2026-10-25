@@ -2,6 +2,7 @@ export * from './lang';
 export * from './i18n';
 export * from './images';
 export * from './Photo';
+export * from './Reveal';
 export * from './Field';
 export * from './Toast';
 export * from './Notice';

@@ -58,8 +58,10 @@ function Login({ onDone }: { onDone: (m: Me) => void }) {
     finally { setBusy(false); }
   };
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--admin-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="card" style={{ width: '100%', maxWidth: 420, padding: 36, gap: 18 }}>
+    <div className="login-wrap" style={{ minHeight: '100vh', background: 'var(--admin-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div className="blob" style={{ width: 340, height: 340, background: '#f0c9d3', top: '-6%', right: '10%' }} />
+      <div className="blob" style={{ width: 300, height: 300, background: '#d6dfc8', bottom: '-8%', left: '6%', animationDelay: '-4s' }} />
+      <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="card login-card" style={{ width: '100%', maxWidth: 420, padding: 36, gap: 18 }}>
         <span style={{ fontFamily: 'var(--font-display)', fontSize: 28, letterSpacing: '0.3em' }}>FLOWTUS</span>
         <h1 className="display" style={{ fontSize: 32 }}>Admin sign in</h1>
         {err ? <div role="alert" className="note error" style={{ fontSize: 14, padding: '10px 12px' }}>{err}</div> : null}

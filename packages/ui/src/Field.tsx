@@ -1,5 +1,5 @@
 'use client';
-import { useId, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { Photo } from './Photo';
 
 export interface Opt {
@@ -80,6 +80,7 @@ const norm = (o: Opt | string): Opt => (typeof o === 'string' ? { value: o, labe
  *  Service booking forms are assembled from configuration with this component, so the owner can edit forms from the admin. */
 export function Field(p: FieldProps) {
   const uid = useId();
+  const [show, setShow] = useState(false);
   const id = `f-${p.name}-${uid}`.replace(/[^a-zA-Z0-9-]/g, '');
   const hintId = id + '-h';
   const errId = id + '-e';
@@ -92,7 +93,22 @@ export function Field(p: FieldProps) {
 
   let control: ReactNode = null;
   switch (p.type) {
-    case 'text': case 'tel': case 'email': case 'number': case 'password': case 'date': case 'time':
+    case 'password':
+      control = (
+        <div className="pw">
+          <input id={id} className={'input' + err} type={show ? 'text' : 'password'} autoComplete={p.ac || 'off'} value={v == null ? '' : String(v)} placeholder={p.ph} disabled={p.disabled}
+            aria-invalid={hasErr} aria-describedby={describedBy} autoCapitalize="off" spellCheck={false} onChange={(e) => p.onChange?.(e.target.value)} />
+          <button type="button" className="pw-eye" aria-label={show ? 'Hide password' : 'Show password'} aria-pressed={show} onClick={() => setShow((x) => !x)}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
+              {show ? null : <path d="M4 4l16 16" />}
+            </svg>
+          </button>
+        </div>
+      );
+      break;
+    case 'text': case 'tel': case 'email': case 'number': case 'date': case 'time':
       control = (
         <input id={id} className={'input' + err} type={p.type === 'number' ? 'text' : p.type} inputMode={p.type === 'number' ? 'numeric' : p.type === 'tel' ? 'tel' : p.type === 'email' ? 'email' : 'text'}
           autoComplete={p.ac || 'off'} value={v == null ? '' : String(v)} min={p.min} max={p.max} placeholder={p.ph} disabled={p.disabled}

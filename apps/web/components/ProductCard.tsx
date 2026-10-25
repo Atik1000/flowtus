@@ -11,7 +11,7 @@ export function ProductCard({ p, lang }: { p: Product; lang: Lang }) {
   const tag = !p.available ? 'Currently unavailable' : mp == null ? 'Price on request' : '';
   const i = lang === 'bn' ? 1 : 0;
   return (
-    <Link href={`/p/${p.slug}`} className="stack g14" style={{ color: 'var(--ink)', textDecoration: 'none', minWidth: 0 }}>
+    <Link href={`/p/${p.slug}`} className="stack g14 pcard" style={{ color: 'var(--ink)', textDecoration: 'none', minWidth: 0 }}>
       <div style={{ position: 'relative' }}>
         <Photo src={p.img ? IMG(p.img, 0, 700) : null} alt={p.name} />
         {tag ? <span style={{ position: 'absolute', top: 12, left: 12, background: 'var(--surface)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '6px 10px', pointerEvents: 'none' }}>{tag}</span> : null}
