@@ -1,0 +1,243 @@
+// FLOWTUS v2 data model.
+// Catalogue entities are normalised tables. Orders and requests keep their price/data snapshot, payments, history,
+// messages, notes, quotes and schedule as JSONB (the shapes are owned by @flowtus/core), with the lookup columns indexed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  owner
+  staff
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  role         Role
+  passwordHash String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Product {
+  id           String   @id
+  slug         String   @unique
+  dept         String
+  cat          String
+  name         String
+  occ          String[]
+  variants     Json
+  short        String   @default("")
+  description  String   @default("")
+  composition  String   @default("")
+  care         String   @default("")
+  available    Boolean  @default(true)
+  archived     Boolean  @default(false)
+  maxQty       Int      @default(10)
+  leadDays     Int      @default(0)
+  builder      Boolean  @default(false)
+  addons       Boolean  @default(false)
+  builderExtra Boolean  @default(false)
+  wrap         Boolean  @default(false)
+  featured     Boolean  @default(false)
+  img          String?
+  sample       Boolean  @default(true)
+  sort         Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([dept, cat])
+}
+
+model CustomItem {
+  id        String  @id
+  name      String
+  bn        String  @default("")
+  type      String
+  unit      String
+  unitPrice Int?
+  priceMode String  @default("confirm")
+  min       Int     @default(1)
+  max       Int     @default(100)
+  multiple  Int     @default(1)
+  presets   Int[]
+  available Boolean @default(true)
+  seasonal  Boolean @default(false)
+  leadDays  Int     @default(1)
+  sort      Int     @default(0)
+}
+
+model Service {
+  id               String   @id
+  grp              String
+  name             Json
+  short            String   @default("")
+  active           Boolean  @default(true)
+  priceModel       String   @default("quote")
+  packages         Json
+  fromPrice        Int?
+  perUnit          String?
+  depositPct       Int      @default(30)
+  leadDays         Int      @default(3)
+  maxDays          Int      @default(180)
+  hours            Int[]
+  durationHrs      Int      @default(3)
+  capacity         Int?
+  coverage         String[]
+  partner          Boolean  @default(false)
+  partnerAvailable Boolean  @default(true)
+  included         String[]
+  excluded         String[]
+  cancellation     String   @default("")
+  img              String?
+  sample           Boolean  @default(true)
+  fields           String[]
+  req              String[]
+  sort             Int      @default(0)
+}
+
+model Occasion {
+  id     String  @id
+  name   Json
+  active Boolean @default(true)
+  sort   Int     @default(0)
+}
+
+model Area {
+  id       String  @id
+  name     Json
+  delivery Boolean @default(true)
+  fee      Int     @default(0)
+  sort     Int     @default(0)
+}
+
+model Block {
+  id     String @id @default(cuid())
+  date   String
+  scope  String
+  slot   String @default("all")
+  reason String @default("")
+
+  @@index([date])
+}
+
+model Team {
+  id   String @id
+  name String
+}
+
+/// Singleton configuration documents: "settings" (contacts, payment methods, policies, FAQs) and "delivery" (windows, cut-off, horizon).
+model AppSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id            String   @id
+  number        String   @unique
+  token         String   @unique
+  createdAt     DateTime
+  status        String
+  paymentMethod String
+  customerPhone String
+  customer      Json
+  recipient     Json?
+  address       String
+  landmark      String   @default("")
+  areaId        String
+  areaName      String
+  date          String
+  slotId        String
+  slotLabel     String
+  giftMessage   String   @default("")
+  deliveryNotes String   @default("")
+  items         Json
+  subtotal      Int
+  fee           Int?
+  total         Int
+  payments      Json
+  rider         String   @default("")
+  history       Json
+  messages      Json
+  notes         Json
+  cancelReason  String?
+
+  @@index([date, slotId])
+  @@index([status])
+  @@index([customerPhone])
+}
+
+model Request {
+  id            String   @id
+  ref           String   @unique
+  token         String   @unique
+  kind          String
+  createdAt     DateTime
+  status        String
+  serviceId     String?
+  serviceName   String?
+  bookingDate   String?
+  customerPhone String
+  data          Json
+  snapshot      Json?
+  customer      Json
+  quotes        Json
+  payments      Json
+  history       Json
+  messages      Json
+  notes         Json
+  team          String   @default("")
+  schedule      Json?
+  terms         Json?
+  reschedule    Json?
+  cancelReason  String?
+
+  @@index([kind, status])
+  @@index([serviceId, bookingDate])
+  @@index([customerPhone])
+}
+
+model AuditEntry {
+  id     Int      @id @default(autoincrement())
+  at     DateTime @default(now())
+  by     String
+  ref    String
+  action String
+
+  @@index([at])
+}
+
+model IdempotencyKey {
+  key       String   @id
+  ref       String
+  createdAt DateTime @default(now())
+}
+
+model Upload {
+  id        String   @id
+  filename  String
+  mime      String
+  size      Int
+  path      String
+  ownerRef  String?
+  createdAt DateTime @default(now())
+}
+
+/// Outbox for SMS / WhatsApp / email. A delivery worker (or provider integration) drains rows where sentAt is null.
+model Notification {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  event     String
+  ref       String
+  phone     String?
+  email     String?
+  body      String
+  sentAt    DateTime?
+}

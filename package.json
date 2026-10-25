@@ -1,0 +1,30 @@
+{
+  "name": "flowtus",
+  "private": true,
+  "version": "2.0.0",
+  "description": "FLOWTUS v2 — storefront, bookings and admin (Next.js + NestJS + PostgreSQL monorepo)",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "build:packages": "npm run build -w @flowtus/core && npm run build -w @flowtus/ui",
+    "build": "npm run build:packages && npm run build -w @flowtus/api && npm run build -w @flowtus/web && npm run build -w @flowtus/admin",
+    "dev:packages": "npm run dev -w @flowtus/core",
+    "dev:api": "npm run start:dev -w @flowtus/api",
+    "dev:web": "npm run dev -w @flowtus/web",
+    "dev:admin": "npm run dev -w @flowtus/admin",
+    "db:migrate": "npm run prisma:migrate -w @flowtus/api",
+    "db:seed": "npm run prisma:seed -w @flowtus/api",
+    "test": "npm run test -w @flowtus/core && npm run test -w @flowtus/api",
+    "typecheck": "npm run typecheck -w @flowtus/core && npm run typecheck -w @flowtus/api && npm run typecheck -w @flowtus/web && npm run typecheck -w @flowtus/admin"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.3"
+  }
+}
