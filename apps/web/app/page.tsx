@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { IMG, Photo, Reveal } from '@flowtus/ui';
+import { GiftScroll } from '@/components/GiftScroll';
 import { ProductCard } from '@/components/ProductCard';
 import { customPrice, svcPrice, waHref } from '@/lib/helpers';
 import { pageContext } from '@/lib/server';
@@ -61,6 +62,8 @@ export default async function Home() {
         <div className="marquee-track">{[...strip, ...strip].map(([en, bn], i) => <span key={i}>{lang === 'bn' ? bn : en}</span>)}</div>
         <div className="marquee-track">{[...strip, ...strip].map(([en, bn], i) => <span key={i}>{lang === 'bn' ? bn : en}</span>)}</div>
       </div>
+
+      <GiftScroll />
 
       <section className="section">
         {heading(t(TX.featTitle), '/shop/flowers')}
